@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -14,9 +15,22 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { MoreHorizontal, UserPlus, Filter, Download, Eye, Trash2 } from 'lucide-react'
 import { ColumnDef } from "@tanstack/react-table"
+import { TableSkeleton } from '@/components/ui/skeleton-loaders'
+import { EmptyUsersState, ErrorState, NetworkErrorState } from '@/components/ui/error-states'
+
+// Define user type
+type User = {
+  id: string
+  name: string
+  email: string
+  role: string
+  status: string
+  joinDate: string
+  lastActive: string
+}
 
 // Extended mock data for better demonstration
-const users = [
+const users: User[] = [
   {
     id: '1',
     name: 'John Doe',
@@ -170,6 +184,134 @@ const columns: ColumnDef<typeof users[0]>[] = [
 ]
 
 export default function UsersPage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [users, setUsers] = useState<User[]>([])
+
+  // Simulate data loading
+  useEffect(() => {
+    const loadUsers = async () => {
+      setIsLoading(true)
+      setError(null)
+      
+      try {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
+        // Simulate random error (10% chance)
+        if (Math.random() < 0.1) {
+          throw new Error('Failed to load users')
+        }
+        
+        // Mock data
+        const mockUsers = [
+          {
+            id: '1',
+            name: 'John Doe',
+            email: 'john.doe@example.com',
+            role: 'Admin',
+            status: 'Active',
+            joinDate: '2024-01-15',
+            lastActive: '2 hours ago',
+          },
+          {
+            id: '2',
+            name: 'Jane Smith',
+            email: 'jane.smith@example.com',
+            role: 'User',
+            status: 'Active',
+            joinDate: '2024-02-20',
+            lastActive: '1 day ago',
+          },
+          {
+            id: '3',
+            name: 'Bob Johnson',
+            email: 'bob.johnson@example.com',
+            role: 'Moderator',
+            status: 'Inactive',
+            joinDate: '2024-03-10',
+            lastActive: '3 days ago',
+          },
+        ]
+        
+        setUsers(mockUsers)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadUsers()
+  }, [])
+
+  const handleRetry = () => {
+    // Trigger reload
+    window.location.reload()
+  }
+
+  const handleAddUser = () => {
+    // Handle add user action
+    console.log('Add user clicked')
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+            <p className="text-muted-foreground">Manage user accounts and permissions.</p>
+          </div>
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
+        </div>
+        <TableSkeleton rows={5} columns={6} />
+      </div>
+    )
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+            <p className="text-muted-foreground">Manage user accounts and permissions.</p>
+          </div>
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
+        </div>
+        <NetworkErrorState onRetry={handleRetry} />
+      </div>
+    )
+  }
+
+  // Show empty state
+  if (users.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+            <p className="text-muted-foreground">Manage user accounts and permissions.</p>
+          </div>
+          <Button>
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add User
+          </Button>
+        </div>
+        <EmptyUsersState onAdd={handleAddUser} />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
