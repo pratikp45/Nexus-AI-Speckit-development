@@ -23,31 +23,27 @@ interface AdminNavbarProps {
 
 export function AdminNavbar({ onMenuClick, sidebarOpen }: AdminNavbarProps) {
   const [darkMode, setDarkMode] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showNotifications, setShowNotifications] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
     // Check for saved theme preference or default to light mode
-    const isDarkMode = localStorage.getItem('darkMode') === 'true'
-    setDarkMode(isDarkMode)
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    const savedTheme = localStorage.getItem('darkMode')
+    setDarkMode(savedTheme === 'true')
   }, [])
 
   const toggleTheme = () => {
-    const newDarkMode = !darkMode
-    setDarkMode(newDarkMode)
+    const newTheme = !darkMode
+    setDarkMode(newTheme)
+    localStorage.setItem('darkMode', newTheme.toString())
     
-    if (newDarkMode) {
+    // Apply theme to document
+    if (newTheme) {
       document.documentElement.classList.add('dark')
-      localStorage.setItem('darkMode', 'true')
     } else {
       document.documentElement.classList.remove('dark')
-      localStorage.setItem('darkMode', 'false')
     }
   }
 
@@ -58,7 +54,7 @@ export function AdminNavbar({ onMenuClick, sidebarOpen }: AdminNavbarProps) {
     
     toast({
       title: "Signed out",
-      description: "You have been successfully signed out of the admin portal.",
+      description: "You have been successfully signed out of admin portal.",
     })
     
     router.push('/admin/login')
@@ -78,12 +74,14 @@ export function AdminNavbar({ onMenuClick, sidebarOpen }: AdminNavbarProps) {
           <span className="sr-only">Toggle navigation menu</span>
         </Button>
 
-        {/* Search bar */}
+        {/* Enhanced Search bar */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder="Search users, content, settings..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-8 md:w-[300px] lg:w-[400px]"
           />
         </div>
@@ -100,11 +98,62 @@ export function AdminNavbar({ onMenuClick, sidebarOpen }: AdminNavbarProps) {
             <span className="sr-only">Toggle theme</span>
           </Button>
 
-          {/* Notifications */}
-          <Button variant="outline" size="icon">
-            <Bell className="h-4 w-4" />
-            <span className="sr-only">View notifications</span>
-          </Button>
+          {/* Enhanced Notifications */}
+          <div className="relative">
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative"
+            >
+              <Bell className="h-4 w-4" />
+              {showNotifications && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full">
+                  <span className="text-xs text-white font-bold">3</span>
+                </div>
+              )}
+              <span className="sr-only">View notifications</span>
+            </Button>
+            
+            {/* Notifications dropdown */}
+            {showNotifications && (
+              <div className="absolute right-0 top-12 w-80 bg-popover border border-border rounded-lg shadow-lg p-4 z-50">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold">Notifications</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowNotifications(false)}
+                  >
+                    Clear all
+                  </Button>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full mt-1"></div>
+                    <div>
+                      <p className="font-medium text-sm">New user registration</p>
+                      <p className="text-xs text-muted-foreground">John Doe signed up 2 minutes ago</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-green-500 rounded-full mt-1"></div>
+                    <div>
+                      <p className="font-medium text-sm">System update completed</p>
+                      <p className="text-xs text-muted-foreground">Version 2.1.0 deployed successfully</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full mt-1"></div>
+                    <div>
+                      <p className="font-medium text-sm">Payment received</p>
+                      <p className="text-xs text-muted-foreground">$99.00 from Premium Plan</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* User menu */}
           <DropdownMenu>

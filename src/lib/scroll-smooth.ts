@@ -1,17 +1,25 @@
-// Smooth scroll behavior implementation
-import { useEffect } from "react";
+// Advanced smooth scroll behavior with performance optimizations
+import { useEffect, useRef } from "react";
 
 export const useSmoothScroll = () => {
-  useEffect(() => {
-    // Enable smooth scrolling for the entire document
-    document.documentElement.style.scrollBehavior = 'smooth';
+  const rafId = useRef<number | null>(null);
+  const isScrolling = useRef(false);
 
-    // Handle anchor links
+  useEffect(() => {
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (!prefersReducedMotion) {
+      // Enable smooth scrolling for the entire document
+      document.documentElement.style.scrollBehavior = 'smooth';
+    }
+
+    // Handle anchor links with performance optimization
     const handleAnchorClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const link = target.closest('a[href^="#"]');
       
-      if (link) {
+      if (link && !isScrolling.current) {
         e.preventDefault();
         const targetId = link.getAttribute('href');
         
@@ -19,23 +27,41 @@ export const useSmoothScroll = () => {
           const targetElement = document.querySelector(targetId);
           
           if (targetElement) {
-            targetElement.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-              inline: 'nearest'
+            isScrolling.current = true;
+            
+            // Cancel any ongoing RAF
+            if (rafId.current) {
+              cancelAnimationFrame(rafId.current);
+            }
+            
+            // Use requestAnimationFrame for smoother performance
+            rafId.current = requestAnimationFrame(() => {
+              targetElement.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+              });
+              
+              // Reset scrolling state after animation
+              setTimeout(() => {
+                isScrolling.current = false;
+              }, 1000);
             });
           }
         }
       }
     };
 
-    // Add event listener
-    document.addEventListener('click', handleAnchorClick);
+    // Add event listener with passive option for better performance
+    document.addEventListener('click', handleAnchorClick, { passive: true });
 
     // Cleanup
     return () => {
       document.removeEventListener('click', handleAnchorClick);
       document.documentElement.style.scrollBehavior = '';
+      if (rafId.current) {
+        cancelAnimationFrame(rafId.current);
+      }
     };
   }, []);
 };

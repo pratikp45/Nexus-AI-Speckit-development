@@ -131,27 +131,54 @@ export function Hero() {
             variants={buttonVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Button
-              size="lg"
-              className="group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Get Started
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </Button>
+              <Button
+                size="lg"
+                className="group relative overflow-hidden bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700 text-white font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-cyan-500/25 transition-all duration-300"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Get Started
+                  <motion.div
+                    whileHover={{ x: 4 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <ArrowRight className="h-5 w-5" />
+                  </motion.div>
+                </span>
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-purple-700"
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </Button>
+            </motion.div>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="group border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-400 font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-cyan-500/15 transition-all duration-300"
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400, damping: 17 }}
             >
-              <span className="flex items-center gap-2">
-                <Play className="h-5 w-5" />
-                Watch Demo
-              </span>
-            </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                className="group border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-400 font-semibold px-8 py-4 text-lg shadow-lg hover:shadow-cyan-500/15 transition-all duration-300"
+              >
+                <span className="flex items-center gap-2">
+                  <motion.div
+                    whileHover={{ rotate: [0, 15, 0] }}
+                    transition={{ duration: 0.6, repeat: Infinity }}
+                  >
+                    <Play className="h-5 w-5" />
+                  </motion.div>
+                  Watch Demo
+                </span>
+              </Button>
+            </motion.div>
           </motion.div>
 
           {/* Trust Indicators */}

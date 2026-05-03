@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { LucideIcon, Moon, Sun, X } from "lucide-react";
+import { LucideIcon, Moon, Sun, X, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/components/ui/providers";
 import { useAnalytics } from "@/lib/analytics";
@@ -231,23 +231,36 @@ export function NavBar({ items = navItems, className }: NavBarProps) {
                     <Icon size={18} strokeWidth={2} />
                     <span>{item.name}</span>
                     
-                    {/* Tubelight effect for active item */}
+                    {/* Enhanced tubelight effect for active item */}
                     {isActive && (
                       <motion.div
                         layoutId="tubelight"
-                        className="absolute inset-0 w-full bg-gradient-to-r from-primary/20 via-primary/10 to-transparent rounded-full -z-10"
+                        className="absolute inset-0 w-full bg-gradient-to-r from-primary/30 via-primary/20 to-transparent rounded-full -z-10"
                         initial={false}
                         transition={{
                           type: "spring",
-                          stiffness: 300,
-                          damping: 30,
+                          stiffness: 400,
+                          damping: 25,
                         }}
                       >
-                        {/* Glow effect */}
+                        {/* Multi-layered glow effect */}
                         <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-primary rounded-full">
-                          <div className="absolute w-12 h-6 bg-primary/20 rounded-full blur-md -top-2 -left-2" />
-                          <div className="absolute w-8 h-4 bg-primary/20 rounded-full blur-sm top-0 left-2" />
+                          <div className="absolute w-12 h-6 bg-primary/30 rounded-full blur-lg -top-2 -left-2 animate-pulse" />
+                          <div className="absolute w-8 h-4 bg-primary/20 rounded-full blur-md top-0 left-2" />
+                          <div className="absolute w-6 h-3 bg-primary/10 rounded-full blur-sm top-1 left-3" />
                         </div>
+                        {/* Animated light rays */}
+                        <motion.div
+                          className="absolute inset-0 w-full h-full"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: [0, 0.6, 0] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        >
+                          <div className="absolute top-0 left-1/2 w-px h-4 bg-gradient-to-b from-primary to-transparent" />
+                          <div className="absolute top-0 right-1/2 w-px h-4 bg-gradient-to-b from-primary to-transparent" />
+                          <div className="absolute top-1/2 left-1/4 w-px h-3 bg-gradient-to-b from-primary to-transparent transform rotate-45" />
+                          <div className="absolute top-1/2 right-1/4 w-px h-3 bg-gradient-to-b from-primary to-transparent transform -rotate-45" />
+                        </motion.div>
                       </motion.div>
                     )}
                   </Link>
@@ -288,6 +301,27 @@ export function NavBar({ items = navItems, className }: NavBarProps) {
                   )}
                 </AnimatePresence>
               </motion.button>
+            </motion.div>
+
+            {/* Admin Panel Button - Desktop Only */}
+            <motion.div {...itemAnimation} className="relative ml-2 hidden lg:block">
+              <Link href="/admin">
+                <motion.button
+                  className="relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border border-primary/20 text-primary hover:bg-primary/10 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/20"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Go to admin panel"
+                >
+                  <Shield size={16} strokeWidth={2} />
+                  <span>Admin</span>
+                  {/* Subtle glow effect on hover */}
+                  <motion.div
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 to-transparent opacity-0"
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </motion.button>
+              </Link>
             </motion.div>
           </div>
 
@@ -401,6 +435,18 @@ export function NavBar({ items = navItems, className }: NavBarProps) {
                       </motion.div>
                     );
                   })}
+                </div>
+
+                {/* Admin Option for Mobile */}
+                <div className="px-4 py-2 border-t border-border">
+                  <Link
+                    href="/admin"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 border border-primary/20 text-primary hover:bg-primary/10"
+                  >
+                    <Shield size={20} strokeWidth={2.5} />
+                    <span>Admin Panel</span>
+                  </Link>
                 </div>
 
                 {/* Sidebar Footer */}
