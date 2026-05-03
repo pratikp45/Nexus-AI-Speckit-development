@@ -3,7 +3,7 @@
 import React from "react";
 import { ThemeProvider } from "@/components/ui/providers";
 import NavBar from "@/components/ui/tubelight-navbar";
-import Hero from "@/components/sections/hero";
+import { Hero } from "@/components/hero";
 import Problem from "@/components/sections/problem";
 import Features from "@/components/sections/features";
 import Testimonials from "@/components/sections/testimonials";
