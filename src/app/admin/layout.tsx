@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import dynamic from 'next/dynamic'
+import '@/styles/admin.css'
 
 // Dynamic imports to avoid build-time context issues
 const AdminSidebar = dynamic(() => import('@/components/admin/admin-sidebar').then(mod => ({ default: mod.AdminSidebar })), {
@@ -24,7 +25,7 @@ export default function AdminLayout({
 
   return (
     <AdminProviders>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen admin-dashboard">
         <div className="flex">
           {/* Sidebar */}
           <AdminSidebar 
@@ -39,8 +40,10 @@ export default function AdminLayout({
               sidebarOpen={sidebarOpen}
             />
             
-            <main className="p-6">
-              {children}
+            <main className="p-6 nexus-fade-in admin-content">
+              <div className="max-w-7xl mx-auto">
+                {children}
+              </div>
             </main>
           </div>
         </div>

@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { MoreHorizontal, UserPlus, Filter, Download, Eye, Trash2 } from 'lucide-react'
+import { MoreHorizontal, UserPlus, Filter, Download, Eye, Trash2, Search, Edit, Trash } from 'lucide-react'
 import { ColumnDef } from "@tanstack/react-table"
 import { TableSkeleton } from '@/components/ui/skeleton-loaders'
 import { EmptyUsersState, ErrorState, NetworkErrorState } from '@/components/ui/error-states'
@@ -111,22 +111,27 @@ const columns: ColumnDef<typeof users[0]>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("name")}</div>
+      <div className="font-medium text-white">{row.getValue("name")}</div>
     ),
   },
   {
     accessorKey: "email",
     header: "Email",
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("email")}</div>
+      <div className="lowercase text-white/70">{row.getValue("email")}</div>
     ),
   },
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => (
-      <Badge variant="outline">{row.getValue("role")}</Badge>
-    ),
+    cell: ({ row }) => {
+      const role = row.getValue("role") as string
+      return (
+        <span className={`nexus-table-badge ${role.toLowerCase()}`}>
+          {role}
+        </span>
+      )
+    },
   },
   {
     accessorKey: "status",
@@ -134,9 +139,9 @@ const columns: ColumnDef<typeof users[0]>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       return (
-        <Badge variant={status === "Active" ? "default" : "secondary"}>
+        <span className={`nexus-table-badge ${status.toLowerCase()}`}>
           {status}
-        </Badge>
+        </span>
       )
     },
   },
@@ -144,7 +149,7 @@ const columns: ColumnDef<typeof users[0]>[] = [
     accessorKey: "joinDate",
     header: "Created Date",
     cell: ({ row }) => (
-      <div className="text-muted-foreground">{row.getValue("joinDate")}</div>
+      <div className="text-white/60">{row.getValue("joinDate")}</div>
     ),
   },
   {
@@ -154,30 +159,14 @@ const columns: ColumnDef<typeof users[0]>[] = [
       const user = row.original
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" />
-              View details
-            </DropdownMenuItem>
-            <DropdownMenuItem>Edit user</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Change role</DropdownMenuItem>
-            <DropdownMenuItem>Reset password</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete user
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="nexus-table-actions">
+          <button className="nexus-action-btn edit">
+            <Edit className="h-4 w-4" />
+          </button>
+          <button className="nexus-action-btn delete">
+            <Trash className="h-4 w-4" />
+          </button>
+        </div>
       )
     },
   },
@@ -313,101 +302,75 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold nexus-gradient-text nexus-heading">Users</h1>
+          <p className="nexus-subheading">
             Manage your platform users and their permissions.
           </p>
         </div>
-        <Button>
+        <button className="nexus-button-primary nexus-interactive">
           <UserPlus className="mr-2 h-4 w-4" />
           Add User
-        </Button>
+        </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,845</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last month
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,341</div>
-            <p className="text-xs text-muted-foreground">
-              +8% from last month
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">New Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">127</div>
-            <p className="text-xs text-muted-foreground">
-              +19% from last month
-            </p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inactive Users</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">504</div>
-            <p className="text-xs text-muted-foreground">
-              -3% from last month
-            </p>
-          </CardContent>
-        </Card>
+      {/* Modern Search Bar */}
+      <div className="nexus-search-container">
+        <Search className="nexus-search-icon h-4 w-4" />
+        <input
+          type="text"
+          placeholder="Search users by name or email..."
+          className="nexus-search-input nexus-input-focus"
+        />
       </div>
 
-      {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>All Users</CardTitle>
-              <CardDescription>
-                A list of all users in your platform including their name, email, role, and status.
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon">
-                <Filter className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <Download className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <DataTable 
-            columns={columns} 
-            data={users} 
-            searchColumn="name"
-            searchPlaceholder="Search users by name..."
-          />
-        </CardContent>
-      </Card>
+      {/* Modern Data Table */}
+      <div className="nexus-data-table-container">
+        <table className="nexus-data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Created Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user) => (
+              <tr key={user.id} className="nexus-list-item">
+                <td className="font-medium text-white">{user.name}</td>
+                <td className="text-white/70 lowercase">{user.email}</td>
+                <td>
+                  <span className={`nexus-table-badge ${user.role.toLowerCase()}`}>
+                    {user.role}
+                  </span>
+                </td>
+                <td>
+                  <span className={`nexus-table-badge ${user.status.toLowerCase()}`}>
+                    {user.status}
+                  </span>
+                </td>
+                <td className="text-white/60">{user.joinDate}</td>
+                <td>
+                  <div className="nexus-table-actions">
+                    <button className="nexus-button-icon secondary nexus-interactive">
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button className="nexus-button-icon secondary nexus-interactive">
+                      <Trash className="h-4 w-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
