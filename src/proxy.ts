@@ -13,30 +13,23 @@ export function proxy(request: NextRequest) {
 
     // Check for authentication
     const authCookie = request.cookies.get('adminAuth')
-    const authStorage = request.cookies.get('adminAuthStorage')
 
     let isAuthenticated = false
     let userRole = null
 
-    // Check cookie authentication (preferred method)
+    // Debug: Log what we're getting
+    console.log('Middleware - Auth cookie:', authCookie?.value)
+
+    // Check cookie authentication
     if (authCookie?.value) {
       try {
         const authData = JSON.parse(authCookie.value)
-        isAuthenticated = authData.isAuthenticated && authData.expiresAt > Date.now()
-        userRole = authData.user?.role
+        if (authData && authData.isAuthenticated === true && authData.expiresAt > Date.now()) {
+          isAuthenticated = true
+          userRole = authData.user?.role || null
+        }
       } catch (error) {
         // Invalid cookie format
-      }
-    }
-
-    // Fallback to localStorage check (for development)
-    if (!isAuthenticated && authStorage?.value) {
-      try {
-        const authData = JSON.parse(authStorage.value)
-        isAuthenticated = authData.isAuthenticated && authData.expiresAt > Date.now()
-        userRole = authData.user?.role
-      } catch (error) {
-        // Invalid storage format
       }
     }
 

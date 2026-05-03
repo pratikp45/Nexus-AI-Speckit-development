@@ -52,10 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Basic validation (in production, this would be a real API call)
+      // Basic validation
       if (email === 'admin@example.com' && password === 'admin123') {
         const userData: User = {
           id: '1',
@@ -67,10 +64,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const authData = {
           isAuthenticated: true,
           user: userData,
-          expiresAt: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+          expiresAt: Date.now() + (24 * 60 * 60 * 1000)
         }
         
+        // Set localStorage
         localStorage.setItem('adminAuth', JSON.stringify(authData))
+        
+        // Set simple cookie
+        document.cookie = `adminAuth=${JSON.stringify(authData)}; path=/; max-age=86400`
+        
         setUser(userData)
         return true
       }
@@ -86,6 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     localStorage.removeItem('adminAuth')
+    // Clear cookie for middleware
+    document.cookie = 'adminAuth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Strict'
     setUser(null)
   }
 

@@ -2,9 +2,18 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { AdminSidebar } from '@/components/admin/admin-sidebar'
-import { AdminNavbar } from '@/components/admin/admin-navbar'
-import { AdminProviders } from '@/components/admin/admin-providers'
+import dynamic from 'next/dynamic'
+
+// Dynamic imports to avoid build-time context issues
+const AdminSidebar = dynamic(() => import('@/components/admin/admin-sidebar').then(mod => ({ default: mod.AdminSidebar })), {
+  ssr: false
+})
+const AdminNavbar = dynamic(() => import('@/components/admin/admin-navbar').then(mod => ({ default: mod.AdminNavbar })), {
+  ssr: false
+})
+const AdminProviders = dynamic(() => import('@/components/admin/admin-providers').then(mod => ({ default: mod.AdminProviders })), {
+  ssr: false
+})
 
 export default function AdminLayout({
   children,
